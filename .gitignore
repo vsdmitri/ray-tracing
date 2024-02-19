@@ -1,0 +1,9 @@
+# Build folders
+cmake-build-debug
+build
+
+# Idea
+/.idea
+
+# Test files
+tests/
