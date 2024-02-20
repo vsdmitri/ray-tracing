@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "utils.hpp"
+#include "ioUtils.hpp"
 #include "Scene.h"
 #include "Plane.h"
 #include "Ellipsoid.h"

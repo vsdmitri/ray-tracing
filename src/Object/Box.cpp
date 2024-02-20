@@ -1,17 +1,12 @@
 #include "Box.h"
 
 std::optional<float> Box::intersect(const Ray &ray) {
-    float tx1 = (-s.x - ray.o.x) / ray.dir.x;
-    float tx2 = (s.x - ray.o.x) / ray.dir.x;
-    if (tx2 < tx1) std::swap(tx1, tx2);
-    float ty1 = (-s.y - ray.o.y) / ray.dir.y;
-    float ty2 = (s.y - ray.o.y) / ray.dir.y;
-    if (ty2 < ty1) std::swap(ty1, ty2);
-    float tz1 = (-s.z - ray.o.z) / ray.dir.z;
-    float tz2 = (s.z - ray.o.z) / ray.dir.z;
-    if (tz2 < tz1) std::swap(tz1, tz2);
-    float t1 = std::max(tx1, std::max(ty1, tz1));
-    float t2 = std::min(tx2, std::min(ty2, tz2));
+    glm::vec3 ts1 = (-s - ray.o) / ray.dir;
+    glm::vec3 ts2 = (+s - ray.o) / ray.dir;
+    for (std::size_t i = 0; i < 3; i++)
+        if (ts1[i] > ts2[i]) std::swap(ts1[i], ts2[i]);
+    float t1 = max3(ts1);
+    float t2 = min3(ts2);
 
     if (t2 < t1) return std::nullopt;
 

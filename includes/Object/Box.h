@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include "Object.h"
+#include "algebraUtils.h"
 
 struct Box : Object {
     Box(const glm::vec3 s) : s(s) {}
