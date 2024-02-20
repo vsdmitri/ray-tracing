@@ -7,7 +7,7 @@
 struct Plane : Object {
     Plane(glm::vec3 n) : normal(n) {}
 
-    std::optional<float> intersect(const Ray &ray) override;
+    [[nodiscard]] std::optional<ObjectIntersection> intersect(Ray) const override;
 
     glm::vec3 normal;
 };

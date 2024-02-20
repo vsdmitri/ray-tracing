@@ -6,6 +6,7 @@
 
 #include "simpleStructs.h"
 #include "Object.h"
+#include "Light.h"
 
 struct Scene {
     struct Camera {
@@ -21,11 +22,19 @@ struct Scene {
 
     void init();
 
-    Color intersect_ray(float pixel_x, float pixel_y);
+    Color get_color(float pixel_x, float pixel_y) const;
+
+    [[nodiscard]] SceneIntersection
+    intersect_ray(const Ray &ray, float max_dist = std::numeric_limits<float>::max()) const;
 
     Color bg_color;
     Camera camera;
+
+    glm::vec3 ambient_light;
+    uint8_t ray_depth;
+
     std::vector<std::unique_ptr<Object>> objects;
+    std::vector<std::unique_ptr<Light>> lights;
 };
 
 

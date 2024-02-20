@@ -1,9 +1,5 @@
 #include "parse.h"
 
-uint8_t double_to_uint(double d) {
-    return round(255 * d);
-}
-
 Scene parse(const std::string &input_filename = "../in.txt") {
     std::ifstream in(input_filename);
     Scene scene;
@@ -18,9 +14,7 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "BG_COLOR") {
-            double r, g, b;
-            s >> r >> g >> b;
-            scene.bg_color = {double_to_uint(r), double_to_uint(g), double_to_uint(b)};
+            s >> scene.bg_color;
             continue;
         }
 
@@ -89,9 +83,49 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "COLOR") {
-            double r, g, b;
-            s >> r >> g >> b;
-            scene.objects.back()->color = {double_to_uint(r), double_to_uint(g), double_to_uint(b)};
+            s >> scene.objects.back()->color;
+            continue;
+        }
+
+        if (command_name == "RAY_DEPTH") {
+            s >> scene.ray_depth;
+            continue;
+        }
+
+        if (command_name == "AMBIENT_LIGHT") {
+            s >> scene.ambient_light;
+            continue;
+        }
+
+        if (command_name == "NEW_LIGHT") {
+            scene.lights.emplace_back();
+            continue;
+        }
+
+        if (command_name == "LIGHT_DIRECTION") {
+            glm::vec3 direction;
+            s >> direction;
+            scene.lights.back() = std::make_unique<DirectionalLight>(direction);
+            continue;
+        }
+
+        if (command_name == "LIGHT_POSITION") {
+            glm::vec3 position;
+            s >> position;
+            scene.lights.back() = std::make_unique<PointLight>(position);
+            continue;
+        }
+
+        if (command_name == "LIGHT_INTENSITY") {
+            s >> scene.lights.back()->intensity;
+            continue;
+        }
+
+        if (command_name == "LIGHT_ATTENUATION") {
+            glm::vec3 attenuation;
+            // TODO ?
+            s >> attenuation;
+            dynamic_cast<PointLight *>(scene.lights.back().get())->set_attenuation(attenuation);
             continue;
         }
 

@@ -4,11 +4,13 @@
 #include <fstream>
 #include <iostream>
 
-#include "ioUtils.hpp"
+#include "../src/ioUtils.hpp"
 #include "Scene.h"
 #include "Plane.h"
 #include "Ellipsoid.h"
 #include "Box.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
 
 uint8_t double_to_uint(double d);
 

@@ -9,7 +9,7 @@
 struct Box : Object {
     Box(const glm::vec3 s) : s(s) {}
 
-    std::optional<float> intersect(const Ray &ray) override;
+    [[nodiscard]] std::optional<ObjectIntersection> intersect(Ray) const override;
 
     glm::vec3 s;
 };

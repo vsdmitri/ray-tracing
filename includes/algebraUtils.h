@@ -5,6 +5,8 @@
 
 #include "vec3.hpp"
 
+constexpr float EPS = 1e-6;
+
 float max3(glm::vec3 v);
 float min3(glm::vec3 v);
 
