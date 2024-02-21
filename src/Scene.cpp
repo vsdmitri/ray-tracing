@@ -88,14 +88,16 @@ Color Scene::process_dielectric(const SceneIntersection &scene_intersection, con
     auto &normal = scene_intersection.object_intersection.normal;
 
     static const float SHIFT = 1e-4;
-    glm::vec3 point = ray.o + ray.dir * scene_intersection.object_intersection.t -
-                      SHIFT * normal;
+    glm::vec3 shifted_forward_point = ray.o + ray.dir * scene_intersection.object_intersection.t -
+                                      SHIFT * normal;
+    glm::vec3 shifted_back_point = ray.o + ray.dir * scene_intersection.object_intersection.t +
+                                   SHIFT * normal;
 
     float cos_theta1 = glm::dot(-ray.dir, normal);
     float sin_theta2 = n1 / n2 * sqrt(1 - cos_theta1 * cos_theta1);
 
     glm::vec3 reflected_direction = ray.dir - 2.f * normal * glm::dot(normal, ray.dir);
-    Ray reflected_ray = {point, reflected_direction};
+    Ray reflected_ray = {shifted_back_point, reflected_direction};
     Color reflected_color = get_color(reflected_ray, depth + 1);
 
     if (sin_theta2 > 1) return reflected_color;
@@ -106,7 +108,7 @@ Color Scene::process_dielectric(const SceneIntersection &scene_intersection, con
     float R0 = (n1 - n2) * (n1 - n2) / (n1 + n2) / (n1 + n2);
     float reflection_factor = R0 + (1 - R0) * std::pow((1 - cos_theta1), 5);
 
-    Ray refracted_ray = {point, refracted_direction};
+    Ray refracted_ray = {shifted_forward_point, refracted_direction};
     Color refracted_color = get_color(refracted_ray, depth + 1);
 
     if (!scene_intersection.object_intersection.is_inside) refracted_color *= object->color;

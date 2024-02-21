@@ -32,7 +32,7 @@ struct Scene {
     Color bg_color;
     Camera camera;
 
-    glm::vec3 ambient_light;
+    glm::vec3 ambient_light = glm::vec3(0);
     uint8_t ray_depth;
 
     std::vector<std::unique_ptr<Object>> objects;
