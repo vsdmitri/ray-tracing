@@ -22,7 +22,9 @@ struct Scene {
 
     void init();
 
-    Color get_color(float pixel_x, float pixel_y) const;
+    Color get_color(const Ray &, uint8_t depth = 0) const;
+
+    Color get_pixel_color(float pixel_x, float pixel_y) const;
 
     [[nodiscard]] SceneIntersection
     intersect_ray(const Ray &ray, float max_dist = std::numeric_limits<float>::max()) const;
@@ -35,6 +37,14 @@ struct Scene {
 
     std::vector<std::unique_ptr<Object>> objects;
     std::vector<std::unique_ptr<Light>> lights;
+
+    [[nodiscard]] Color process_diffuse(const Color &color, const glm::vec3 &point, const glm::vec3 &normal) const;
+
+    [[nodiscard]] Color
+    process_metalic(const Color &color, const glm::vec3 &point, const glm::vec3 &normal, const Ray &ray,
+                    uint8_t depth) const;
+
+    Color process_dielectric(const SceneIntersection &, const Ray &ray, uint8_t depth) const;
 };
 
 

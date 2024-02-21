@@ -9,7 +9,6 @@ struct Ray {
     glm::vec3 o, dir;
 };
 
-// TODO: check normals
 struct ObjectIntersection {
     float t = std::numeric_limits<float>::max();
     glm::vec3 normal;

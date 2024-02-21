@@ -11,6 +11,7 @@ struct Object {
     glm::vec3 position = {0, 0, 0};
     glm::quat rotation = {1, 0, 0, 0}, inverse_rotation = {1, 0, 0, 0};
     Color color;
+    float index_of_reflection;
     Material material = Material::DIFFUSE;
 
     [[nodiscard]] virtual std::optional<ObjectIntersection> intersect(Ray) const = 0;

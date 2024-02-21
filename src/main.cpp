@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
     for (std::size_t i = 0; i < scene.camera.width; i++) {
         for (std::size_t j = 0; j < scene.camera.height; j++) {
-            img.set_color(j, i, scene.get_color(i + 0.5f, j + 0.5f));
+            img.set_color(j, i, scene.get_pixel_color(i + 0.5f, j + 0.5f));
         }
     }
 

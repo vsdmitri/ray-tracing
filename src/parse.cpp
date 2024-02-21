@@ -88,7 +88,9 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "RAY_DEPTH") {
-            s >> scene.ray_depth;
+            int depth;
+            s >> depth;
+            scene.ray_depth = depth;
             continue;
         }
 
@@ -123,9 +125,23 @@ Scene parse(const std::string &input_filename = "../in.txt") {
 
         if (command_name == "LIGHT_ATTENUATION") {
             glm::vec3 attenuation;
-            // TODO ?
             s >> attenuation;
             dynamic_cast<PointLight *>(scene.lights.back().get())->set_attenuation(attenuation);
+            continue;
+        }
+
+        if (command_name == "METALLIC") {
+            scene.objects.back()->material = Material::METALLIC;
+            continue;
+        }
+
+        if (command_name == "DIELECTRIC") {
+            scene.objects.back()->material = Material::DIELECTRIC;
+            continue;
+        }
+
+        if (command_name == "IOR") {
+            s >> scene.objects.back()->index_of_reflection;
             continue;
         }
 
