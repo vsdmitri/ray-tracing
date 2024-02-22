@@ -6,11 +6,11 @@
 #include "simpleStructs.h"
 
 struct Light {
-    glm::vec3 intensity;
+    glm::dvec3 intensity;
 
-    [[nodiscard]] virtual glm::vec3 get_intensity(const glm::vec3 &point) const = 0;
-    [[nodiscard]] virtual glm::vec3 get_on_light_direction(const glm::vec3 &point) const = 0;
-    [[nodiscard]] virtual float get_distance(const glm::vec3 &point) const = 0;
+    [[nodiscard]] virtual glm::dvec3 get_intensity(const glm::dvec3 &point) const = 0;
+    [[nodiscard]] virtual glm::dvec3 get_on_light_direction(const glm::dvec3 &point) const = 0;
+    [[nodiscard]] virtual double get_distance(const glm::dvec3 &point) const = 0;
 
     virtual ~Light() = default;
 };

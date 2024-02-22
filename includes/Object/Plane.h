@@ -5,11 +5,11 @@
 
 
 struct Plane : Object {
-    Plane(glm::vec3 n) : normal(n) {}
+    Plane(glm::dvec3 n) : normal(n) {}
 
     [[nodiscard]] std::optional<ObjectIntersection> intersect(Ray) const override;
 
-    glm::vec3 normal;
+    glm::dvec3 normal;
 };
 
 

@@ -5,9 +5,9 @@
 
 #include "vec3.hpp"
 
-constexpr float EPS = 1e-5;
+constexpr double EPS = 1e-5;
 
-float max3(glm::vec3 v);
-float min3(glm::vec3 v);
+double max3(glm::dvec3 v);
+double min3(glm::dvec3 v);
 
 #endif //RAY_TRACING_ALGEBRAUTILS_H

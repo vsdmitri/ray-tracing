@@ -4,11 +4,11 @@
 #include "Object.h"
 
 struct Ellipsoid : Object {
-    Ellipsoid(glm::vec3 rs) : rs(rs) {}
+    Ellipsoid(glm::dvec3 rs) : rs(rs) {}
 
     [[nodiscard]] std::optional<ObjectIntersection> intersect(Ray) const override;
 
-    glm::vec3 rs;
+    glm::dvec3 rs;
 };
 
 

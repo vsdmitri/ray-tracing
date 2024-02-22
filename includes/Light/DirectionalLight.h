@@ -4,13 +4,13 @@
 #include "Light.h"
 
 struct DirectionalLight : Light {
-    glm::vec3 direction;
+    glm::dvec3 direction;
 
-    DirectionalLight(const glm::vec3& direction) : direction(direction) {}
+    DirectionalLight(const glm::dvec3& direction) : direction(direction) {}
 
-    [[nodiscard]] glm::vec3 get_intensity(const glm::vec3 &point) const override;
-    [[nodiscard]] glm::vec3 get_on_light_direction(const glm::vec3 &point) const override;
-    [[nodiscard]] float get_distance(const glm::vec3 &point) const override;
+    [[nodiscard]] glm::dvec3 get_intensity(const glm::dvec3 &point) const override;
+    [[nodiscard]] glm::dvec3 get_on_light_direction(const glm::dvec3 &point) const override;
+    [[nodiscard]] double get_distance(const glm::dvec3 &point) const override;
 };
 
 

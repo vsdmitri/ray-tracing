@@ -4,9 +4,9 @@ void Scene::Camera::init() {
     fov_tg2_y = fov_tg2_x * height / width;
 }
 
-Ray Scene::Camera::get_ray(float pixel_x, float pixel_y) const {
-    float X = (2 * pixel_x / width - 1) * fov_tg2_x;
-    float Y = -(2 * pixel_y / height - 1) * fov_tg2_y;
+Ray Scene::Camera::get_ray(double pixel_x, double pixel_y) const {
+    double X = (2 * pixel_x / width - 1) * fov_tg2_x;
+    double Y = -(2 * pixel_y / height - 1) * fov_tg2_y;
     return {position, glm::normalize(X * right + Y * up + forward)};
 
 }
@@ -15,7 +15,7 @@ void Scene::init() {
     camera.init();
 }
 
-Color Scene::get_pixel_color(float_t pixel_x, float pixel_y) const {
+Color Scene::get_pixel_color(double_t pixel_x, double pixel_y) const {
     Ray ray = camera.get_ray(pixel_x, pixel_y);
     return get_color(ray);
 }
@@ -26,8 +26,8 @@ Color Scene::get_color(const Ray &ray, uint8_t depth) const {
     if (intersection_result.object_id == SceneIntersection::NO_OBJECT_ID) return bg_color;
 
     const auto &object = objects[intersection_result.object_id];
-    static const float SHIFT = 1e-4;
-    glm::vec3 point = ray.o + ray.dir * intersection_result.object_intersection.t +
+    static const double SHIFT = 1e-4;
+    glm::dvec3 point = ray.o + ray.dir * intersection_result.object_intersection.t +
                       SHIFT * intersection_result.object_intersection.normal;
 
     Color color = object->color;
@@ -42,7 +42,7 @@ Color Scene::get_color(const Ray &ray, uint8_t depth) const {
     }
 }
 
-SceneIntersection Scene::intersect_ray(const Ray &ray, float max_dist) const {
+SceneIntersection Scene::intersect_ray(const Ray &ray, double max_dist) const {
     SceneIntersection scene_intersection;
     scene_intersection.object_id = SceneIntersection::NO_OBJECT_ID;
     scene_intersection.object_intersection.t = max_dist;
@@ -59,54 +59,54 @@ SceneIntersection Scene::intersect_ray(const Ray &ray, float max_dist) const {
     return scene_intersection;
 }
 
-Color Scene::process_diffuse(const Color &color, const glm::vec3 &point, const glm::vec3 &normal) const {
-    glm::vec3 additional_color = ambient_light;
+Color Scene::process_diffuse(const Color &color, const glm::dvec3 &point, const glm::dvec3 &normal) const {
+    glm::dvec3 additional_color = ambient_light;
     for (const auto &light: lights) {
-        float dist = light->get_distance(point);
+        double dist = light->get_distance(point);
         Ray to_light = {point, light->get_on_light_direction(point)};
         auto intersection = intersect_ray(to_light, dist);
         if (intersection.object_id == SceneIntersection::NO_OBJECT_ID) {
-            additional_color += light->get_intensity(point) * std::max(0.f, glm::dot(to_light.dir, normal));
+            additional_color += light->get_intensity(point) * std::max(0., glm::dot(to_light.dir, normal));
         }
     }
 
     return color * additional_color;
 }
 
-Color Scene::process_metalic(const Color &color, const glm::vec3 &point, const glm::vec3 &normal, const Ray &ray,
+Color Scene::process_metalic(const Color &color, const glm::dvec3 &point, const glm::dvec3 &normal, const Ray &ray,
                              uint8_t depth) const {
-    glm::vec3 new_direction = ray.dir - 2.f * normal * glm::dot(normal, ray.dir);
+    glm::dvec3 new_direction = ray.dir - 2. * normal * glm::dot(normal, ray.dir);
     Ray new_ray = {point, new_direction};
     return color * get_color(new_ray, depth + 1);
 }
 
 Color Scene::process_dielectric(const SceneIntersection &scene_intersection, const Ray &ray, uint8_t depth) const {
     auto &object = objects[scene_intersection.object_id];
-    float n1 = 1;
-    float n2 = object->index_of_reflection;
+    double n1 = 1;
+    double n2 = object->index_of_reflection;
     if (scene_intersection.object_intersection.is_inside) std::swap(n1, n2);
     auto &normal = scene_intersection.object_intersection.normal;
 
-    static const float SHIFT = 1e-4;
-    glm::vec3 shifted_forward_point = ray.o + ray.dir * scene_intersection.object_intersection.t -
+    static const double SHIFT = 1e-4;
+    glm::dvec3 shifted_forward_point = ray.o + ray.dir * scene_intersection.object_intersection.t -
                                       SHIFT * normal;
-    glm::vec3 shifted_back_point = ray.o + ray.dir * scene_intersection.object_intersection.t +
+    glm::dvec3 shifted_back_point = ray.o + ray.dir * scene_intersection.object_intersection.t +
                                    SHIFT * normal;
 
-    float cos_theta1 = glm::dot(-ray.dir, normal);
-    float sin_theta2 = n1 / n2 * sqrt(1 - cos_theta1 * cos_theta1);
+    double cos_theta1 = glm::dot(-ray.dir, normal);
+    double sin_theta2 = n1 / n2 * sqrt(1 - cos_theta1 * cos_theta1);
 
-    glm::vec3 reflected_direction = ray.dir - 2.f * normal * glm::dot(normal, ray.dir);
+    glm::dvec3 reflected_direction = ray.dir - 2. * normal * glm::dot(normal, ray.dir);
     Ray reflected_ray = {shifted_back_point, reflected_direction};
     Color reflected_color = get_color(reflected_ray, depth + 1);
 
     if (sin_theta2 > 1) return reflected_color;
 
-    float cos_theta2 = sqrt(1 - sin_theta2 * sin_theta2);
-    glm::vec3 refracted_direction = n1 / n2 * ray.dir + (n1 / n2 * cos_theta1 - cos_theta2) * normal;
+    double cos_theta2 = sqrt(1 - sin_theta2 * sin_theta2);
+    glm::dvec3 refracted_direction = n1 / n2 * ray.dir + (n1 / n2 * cos_theta1 - cos_theta2) * normal;
 
-    float R0 = (n1 - n2) * (n1 - n2) / (n1 + n2) / (n1 + n2);
-    float reflection_factor = R0 + (1 - R0) * std::pow((1 - cos_theta1), 5);
+    double R0 = (n1 - n2) * (n1 - n2) / (n1 + n2) / (n1 + n2);
+    double reflection_factor = R0 + (1 - R0) * std::pow((1 - cos_theta1), 5);
 
     Ray refracted_ray = {shifted_forward_point, refracted_direction};
     Color refracted_color = get_color(refracted_ray, depth + 1);

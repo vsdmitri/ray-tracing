@@ -7,11 +7,11 @@
 #include "algebraUtils.h"
 
 struct Box : Object {
-    Box(const glm::vec3 s) : s(s) {}
+    Box(const glm::dvec3 s) : s(s) {}
 
     [[nodiscard]] std::optional<ObjectIntersection> intersect(Ray) const override;
 
-    glm::vec3 s;
+    glm::dvec3 s;
 };
 
 #endif //HW1_BOX_H

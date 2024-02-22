@@ -39,7 +39,7 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "CAMERA_FOV_X") {
-            float fov_x;
+            double fov_x;
             s >> fov_x;
             scene.camera.fov_tg2_x = std::tan(fov_x / 2);
             continue;
@@ -51,21 +51,21 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "PLANE") {
-            glm::vec3 normal;
+            glm::dvec3 normal;
             s >> normal;
             scene.objects.back() = std::make_unique<Plane>(normal);
             continue;
         }
 
         if (command_name == "ELLIPSOID") {
-            glm::vec3 rs;
+            glm::dvec3 rs;
             s >> rs;
             scene.objects.back() = std::make_unique<Ellipsoid>(rs);
             continue;
         }
 
         if (command_name == "BOX") {
-            glm::vec3 ss;
+            glm::dvec3 ss;
             s >> ss;
             scene.objects.back() = std::make_unique<Box>(ss);
             continue;
@@ -105,14 +105,14 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "LIGHT_DIRECTION") {
-            glm::vec3 direction;
+            glm::dvec3 direction;
             s >> direction;
             scene.lights.back() = std::make_unique<DirectionalLight>(direction);
             continue;
         }
 
         if (command_name == "LIGHT_POSITION") {
-            glm::vec3 position;
+            glm::dvec3 position;
             s >> position;
             scene.lights.back() = std::make_unique<PointLight>(position);
             continue;
@@ -124,7 +124,7 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "LIGHT_ATTENUATION") {
-            glm::vec3 attenuation;
+            glm::dvec3 attenuation;
             s >> attenuation;
             dynamic_cast<PointLight *>(scene.lights.back().get())->set_attenuation(attenuation);
             continue;
