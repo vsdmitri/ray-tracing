@@ -15,13 +15,17 @@ void Scene::init() {
     camera.init();
 }
 
-Color Scene::get_pixel_color(float_t pixel_x, float pixel_y) const {
-    Ray ray = camera.get_ray(pixel_x, pixel_y);
-    return get_color(ray);
+Color Scene::get_pixel_color(uint32_t pixel_x, uint32_t pixel_y, RandomGenerator &rnd) const {
+    Color color = {0, 0, 0};
+    for (std::size_t i = 0; i < samples; i++) {
+        Ray ray = camera.get_ray(pixel_x + rnd.get_random_float(), pixel_y + rnd.get_random_float());
+        color += get_color(ray, rnd);
+    }
+    return color / static_cast<float>(samples);
 }
 
-Color Scene::get_color(const Ray &ray, uint8_t depth) const {
-    if (depth == ray_depth) return bg_color;
+Color Scene::get_color(const Ray &ray, RandomGenerator &rnd, uint8_t depth) const {
+    if (depth == ray_depth) return {0, 0, 0};
     auto intersection_result = intersect_ray(ray);
     if (intersection_result.object_id == SceneIntersection::NO_OBJECT_ID) return bg_color;
 
@@ -34,11 +38,11 @@ Color Scene::get_color(const Ray &ray, uint8_t depth) const {
 
     switch (object->material) {
         case Material::DIFFUSE:
-            return process_diffuse(color, point, intersection_result.object_intersection.normal);
+            return process_diffuse(intersection_result, color, point, depth, rnd);
         case Material::METALLIC:
-            return process_metalic(color, point, intersection_result.object_intersection.normal, ray, depth);
+            return process_metalic(color, point, intersection_result.object_intersection.normal, ray, depth, rnd);
         case Material::DIELECTRIC:
-            return process_dielectric(intersection_result, ray, depth);
+            return process_dielectric(intersection_result, ray, depth, rnd);
     }
 }
 
@@ -59,28 +63,31 @@ SceneIntersection Scene::intersect_ray(const Ray &ray, float max_dist) const {
     return scene_intersection;
 }
 
-Color Scene::process_diffuse(const Color &color, const glm::vec3 &point, const glm::vec3 &normal) const {
-    glm::vec3 additional_color = ambient_light;
-    for (const auto &light: lights) {
-        float dist = light->get_distance(point);
-        Ray to_light = {point, light->get_on_light_direction(point)};
-        auto intersection = intersect_ray(to_light, dist);
-        if (intersection.object_id == SceneIntersection::NO_OBJECT_ID) {
-            additional_color += light->get_intensity(point) * std::max(0.f, glm::dot(to_light.dir, normal));
-        }
-    }
+Color Scene::get_reflected_color(const glm::vec3 &point, const glm::vec3 &normal, const Ray &ray,
+                                 uint8_t depth, RandomGenerator &rnd) const {
+    glm::vec3 new_direction = ray.dir - 2.f * normal * glm::dot(normal, ray.dir);
+    Ray new_ray = {point, new_direction};
+    return get_color(new_ray, rnd, depth + 1);
+}
 
-    return color * additional_color;
+Color Scene::process_diffuse(const SceneIntersection &scene_intersection, const Color &color, const glm::vec3 &point,
+                             uint8_t depth, RandomGenerator &rnd) const {
+    auto &object = objects[scene_intersection.object_id];
+    auto w = rnd.get_random_semi_sphere_vec(scene_intersection.object_intersection.normal);
+    Ray new_ray = {point, w};
+//    E+2C·Lin(ω)·(ω·n)
+    return object->emission + 2.f * object->color * get_color(new_ray, rnd, depth + 1) *
+                              glm::dot(w, scene_intersection.object_intersection.normal);
 }
 
 Color Scene::process_metalic(const Color &color, const glm::vec3 &point, const glm::vec3 &normal, const Ray &ray,
-                             uint8_t depth) const {
-    glm::vec3 new_direction = ray.dir - 2.f * normal * glm::dot(normal, ray.dir);
-    Ray new_ray = {point, new_direction};
-    return color * get_color(new_ray, depth + 1);
+                             uint8_t depth, RandomGenerator &rnd) const {
+
+    return color * get_reflected_color(point, normal, ray, depth, rnd);
 }
 
-Color Scene::process_dielectric(const SceneIntersection &scene_intersection, const Ray &ray, uint8_t depth) const {
+Color Scene::process_dielectric(const SceneIntersection &scene_intersection, const Ray &ray, uint8_t depth,
+                                RandomGenerator &rnd) const {
     auto &object = objects[scene_intersection.object_id];
     float n1 = 1;
     float n2 = object->index_of_reflection;
@@ -96,21 +103,20 @@ Color Scene::process_dielectric(const SceneIntersection &scene_intersection, con
     float cos_theta1 = glm::dot(-ray.dir, normal);
     float sin_theta2 = n1 / n2 * sqrt(1 - cos_theta1 * cos_theta1);
 
-    glm::vec3 reflected_direction = ray.dir - 2.f * normal * glm::dot(normal, ray.dir);
-    Ray reflected_ray = {shifted_back_point, reflected_direction};
-    Color reflected_color = get_color(reflected_ray, depth + 1);
-
-    if (sin_theta2 > 1) return reflected_color;
+    if (sin_theta2 > 1) return get_reflected_color(shifted_back_point, normal, ray, depth, rnd);
 
     float cos_theta2 = sqrt(1 - sin_theta2 * sin_theta2);
     glm::vec3 refracted_direction = n1 / n2 * ray.dir + (n1 / n2 * cos_theta1 - cos_theta2) * normal;
 
     float R0 = (n1 - n2) * (n1 - n2) / (n1 + n2) / (n1 + n2);
     float reflection_factor = R0 + (1 - R0) * std::pow((1 - cos_theta1), 5);
+    if (rnd.get_random_float() <= reflection_factor) {
+        return get_reflected_color(shifted_back_point, normal, ray, depth, rnd);
+    } else {
+        Ray refracted_ray = {shifted_forward_point, refracted_direction};
+        Color refracted_color = get_color(refracted_ray, rnd, depth + 1);
 
-    Ray refracted_ray = {shifted_forward_point, refracted_direction};
-    Color refracted_color = get_color(refracted_ray, depth + 1);
-
-    if (!scene_intersection.object_intersection.is_inside) refracted_color *= object->color;
-    return reflection_factor * reflected_color + (1.f - reflection_factor) * refracted_color;
+        if (!scene_intersection.object_intersection.is_inside) refracted_color *= object->color;
+        return refracted_color;
+    }
 }

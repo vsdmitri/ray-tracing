@@ -94,39 +94,13 @@ Scene parse(const std::string &input_filename = "../in.txt") {
             continue;
         }
 
-        if (command_name == "AMBIENT_LIGHT") {
-            s >> scene.ambient_light;
+        if (command_name == "SAMPLES") {
+            s >> scene.samples;
             continue;
         }
 
-        if (command_name == "NEW_LIGHT") {
-            scene.lights.emplace_back();
-            continue;
-        }
-
-        if (command_name == "LIGHT_DIRECTION") {
-            glm::vec3 direction;
-            s >> direction;
-            scene.lights.back() = std::make_unique<DirectionalLight>(direction);
-            continue;
-        }
-
-        if (command_name == "LIGHT_POSITION") {
-            glm::vec3 position;
-            s >> position;
-            scene.lights.back() = std::make_unique<PointLight>(position);
-            continue;
-        }
-
-        if (command_name == "LIGHT_INTENSITY") {
-            s >> scene.lights.back()->intensity;
-            continue;
-        }
-
-        if (command_name == "LIGHT_ATTENUATION") {
-            glm::vec3 attenuation;
-            s >> attenuation;
-            dynamic_cast<PointLight *>(scene.lights.back().get())->set_attenuation(attenuation);
+        if (command_name == "EMISSION") {
+            s >> scene.objects.back()->emission;
             continue;
         }
 

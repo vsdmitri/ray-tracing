@@ -1,6 +1,10 @@
+#include <thread>
+#include <vector>
+
 #include "Scene.h"
 #include "parse.h"
 #include "Image.h"
+#include "RandomGenerator.h"
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -10,10 +14,10 @@ int main(int argc, char **argv) {
 
     Scene scene = parse(argv[1]);
     Image img(scene.camera.width, scene.camera.height);
-
+    RandomGenerator r;
     for (std::size_t i = 0; i < scene.camera.width; i++) {
         for (std::size_t j = 0; j < scene.camera.height; j++) {
-            img.set_color(j, i, scene.get_pixel_color(i + 0.5f, j + 0.5f));
+            img.set_color(j, i, scene.get_pixel_color(i, j, r));
         }
     }
 
