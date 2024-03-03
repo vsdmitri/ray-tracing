@@ -11,9 +11,11 @@ public:
 
     glm::vec3 get_random_semi_sphere_vec(const glm::vec3 &normal);
 private:
-    std::random_device rnd;
-    std::uniform_real_distribution<float>::param_type from_neg1{-1, 1};
-    std::uniform_real_distribution<float> random_gen;
+    struct pcg32_random_t { uint64_t state;  uint64_t inc; };
+
+    pcg32_random_t gen;
+
+    static uint32_t pcg32_random_r(pcg32_random_t* rng);
 };
 
 #endif //RAY_TRACING_RANDOMGENERATOR_H

@@ -1,7 +1,7 @@
 #include "Box.h"
 
-std::optional<ObjectIntersection> Box::intersect(Ray ray) const {
-    ray = prepare_ray(ray);
+ObjectIntersection Box::intersect(Ray ray) const {
+    prepare_ray(ray);
     glm::vec3 ts1 = (-s - ray.o) / ray.dir;
     glm::vec3 ts2 = (+s - ray.o) / ray.dir;
     for (std::size_t i = 0; i < 3; i++)
@@ -9,12 +9,12 @@ std::optional<ObjectIntersection> Box::intersect(Ray ray) const {
     float t1 = max3(ts1);
     float t2 = min3(ts2);
 
-    if (t2 < t1) return std::nullopt;
+    if (t2 < t1) return {};
 
     float target_t;
     if (t1 >= 0) target_t = t1;
     else if (t2 >= 0) target_t = t2;
-    else return std::nullopt;
+    else return {};
 
     glm::vec3 P = ray.o + ray.dir * target_t;
     glm::vec3 current_normal = P / s;

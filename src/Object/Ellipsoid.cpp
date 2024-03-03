@@ -1,12 +1,12 @@
 #include "Ellipsoid.h"
 
-std::optional<ObjectIntersection> Ellipsoid::intersect(Ray ray) const {
-    ray = prepare_ray(ray);
+ObjectIntersection Ellipsoid::intersect(Ray ray) const {
+    prepare_ray(ray);
     float c = glm::dot(ray.o / rs, ray.o / rs) - 1;
     float b = 2 * glm::dot(ray.o / rs, ray.dir / rs);
     float a = glm::dot(ray.dir / rs, ray.dir / rs);
     float D = b * b - 4 * a * c;
-    if (D < 0) return std::nullopt;
+    if (D < 0) return {};
     D = sqrt(D);
 
     float t1 = (-b - D) / (2 * a);
@@ -16,7 +16,7 @@ std::optional<ObjectIntersection> Ellipsoid::intersect(Ray ray) const {
     float target_t;
     if (t1 >= 0) target_t = t1;
     else if (t2 >= 0) target_t = t2;
-    else return std::nullopt;
+    else return {};
 
     glm::vec3 P = ray.o + ray.dir * target_t;
     glm::vec3 current_normal = P / rs / rs;

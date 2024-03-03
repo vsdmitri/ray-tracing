@@ -6,7 +6,7 @@
 struct Ellipsoid : Object {
     Ellipsoid(glm::vec3 rs) : rs(rs) {}
 
-    [[nodiscard]] std::optional<ObjectIntersection> intersect(Ray) const override;
+    [[nodiscard]] ObjectIntersection intersect(Ray) const override;
 
     glm::vec3 rs;
 };

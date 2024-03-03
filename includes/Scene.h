@@ -22,9 +22,9 @@ struct Scene {
 
     void init();
 
-    Color get_color(const Ray &, RandomGenerator& r, uint8_t depth = 0) const;
+    Color get_color(const Ray &, RandomGenerator &r, uint8_t depth = 0) const;
 
-    Color get_pixel_color(uint32_t pixel_x, uint32_t pixel_y, RandomGenerator& r) const;
+    Color get_pixel_color(uint32_t pixel_x, uint32_t pixel_y, RandomGenerator &r) const;
 
     [[nodiscard]] SceneIntersection
     intersect_ray(const Ray &ray, float max_dist = std::numeric_limits<float>::max()) const;
@@ -38,17 +38,17 @@ struct Scene {
     std::vector<std::unique_ptr<Object>> objects;
 
     [[nodiscard]] Color
-    process_diffuse(const SceneIntersection &scene_intersection, const Color &color, const glm::vec3 &point,
-                    uint8_t depth, RandomGenerator& r) const;
+    process_diffuse(const SceneIntersection &, const Ray &ray, uint8_t depth, RandomGenerator &r) const;
 
     [[nodiscard]] Color
-    process_metalic(const Color &color, const glm::vec3 &point, const glm::vec3 &normal, const Ray &ray,
-                    uint8_t depth, RandomGenerator& r) const;
+    process_metalic(const SceneIntersection &, const Ray &ray, uint8_t depth, RandomGenerator &r) const;
 
-    Color process_dielectric(const SceneIntersection &, const Ray &ray, uint8_t depth, RandomGenerator& r) const;
+    Color process_dielectric(const SceneIntersection &, const Ray &ray, uint8_t depth, RandomGenerator &r) const;
 
     Color get_reflected_color(const glm::vec3 &point, const glm::vec3 &normal, const Ray &ray,
                               uint8_t depth, RandomGenerator &rnd) const;
+
+    static constexpr const float SHIFT = 1e-4;
 };
 
 
