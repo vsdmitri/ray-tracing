@@ -24,11 +24,13 @@ double BoxUniform::pdf(const glm::dvec3 &x, const glm::dvec3 &, const glm::dvec3
     double result = 0.;
 
     auto intersection = box_->intersect(ray);
+    double TODO = intersection.t;
     if (intersection.t != std::numeric_limits<double>::max()) {
         result += 1 / area_ * get_p_factor(d, intersection);
         ray.o += d * (intersection.t + SHIFT);
         intersection = box_->intersect(ray);
         if (intersection.t != std::numeric_limits<double>::max()) {
+            intersection.t += TODO - SHIFT;
             result += 1 / area_ * get_p_factor(d, intersection);
         }
     }

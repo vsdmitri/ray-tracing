@@ -96,10 +96,6 @@ Color Scene::process_diffuse(const SceneIntersection &scene_intersection, const 
     Ray new_ray = {point, w};
     auto dot = glm::dot(w, normal);
 
-    if (dot < 0) {
-        return object->emission;
-    }
-
     auto res = object->emission + object->color * static_cast<double> (M_1_PI) * get_color(new_ray, rnd, depth + 1) *
                                  dot / pdf;
     return res;
