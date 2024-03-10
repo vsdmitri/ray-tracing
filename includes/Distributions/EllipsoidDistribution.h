@@ -14,7 +14,7 @@ struct EllipsoidDistribution : Distribution {
         rr2 *= rr2;
     };
 
-    glm::dvec3 sample(const glm::dvec3 &x, const glm::dvec3 &n, RandomGenerator &r) const override;
+    glm::dvec3 sample(const glm::dvec3 &x, const glm::dvec3 &n, RandomGenerator &r, bool regen = true) const override;
 
     [[nodiscard]] double pdf(const glm::dvec3 &x, const glm::dvec3 &n, const glm::dvec3 &d) const override;
 

@@ -1,8 +1,10 @@
 #include "MixDistribution.h"
 
-glm::dvec3 MixDistribution::sample(const glm::dvec3 &x, const glm::dvec3 &n, RandomGenerator &r) const {
-    uint32_t index = r.get_random_uint(dists_.size());
-    return dists_[index]->sample(x, n, r);
+glm::dvec3 MixDistribution::sample(const glm::dvec3 &x, const glm::dvec3 &n, RandomGenerator &r, bool regen) const {
+    if (!regen) {
+        last_id_ = r.get_random_uint(dists_.size());
+    }
+    return dists_[last_id_]->sample(x, n, r);
 }
 
 double MixDistribution::pdf(const glm::dvec3 &x, const glm::dvec3 &n, const glm::dvec3 &d) const {

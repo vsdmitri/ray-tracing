@@ -1,6 +1,6 @@
 #include "Cosine.h"
 
-glm::dvec3 Cosine::sample(const glm::dvec3 &, const glm::dvec3 &n, RandomGenerator &r) const {
+glm::dvec3 Cosine::sample(const glm::dvec3 &, const glm::dvec3 &n, RandomGenerator &r, bool) const {
     auto v = r.get_random_sphere_vec();
     auto v_new = glm::normalize(v + n);
     return v_new;

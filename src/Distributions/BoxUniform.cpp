@@ -1,6 +1,6 @@
 #include "BoxUniform.h"
 
-glm::dvec3 BoxUniform::sample(const glm::dvec3 &x, const glm::dvec3 &, RandomGenerator &r) const {
+glm::dvec3 BoxUniform::sample(const glm::dvec3 &x, const glm::dvec3 &, RandomGenerator &r, bool) const {
     double u = r.get_random_float(0., area_);
     double a = r.get_random_float(-1., 1.), b = r.get_random_float(-1., 1.);
     const auto &s = box_->s;
@@ -24,12 +24,12 @@ double BoxUniform::pdf(const glm::dvec3 &x, const glm::dvec3 &, const glm::dvec3
     double result = 0.;
 
     auto intersection = box_->intersect(ray);
-    if (intersection.t != std::numeric_limits<double>::max()) {
+    if (intersection.t < std::numeric_limits<double>::max()) {
         auto y = x + d * intersection.t;
         result += 1 / area_ * get_p_factor(x, y, intersection.normal);
-        ray.o += d * intersection.t - SHIFT * intersection.normal;
+        ray.o += d * (intersection.t + SHIFT);
         intersection = box_->intersect(ray);
-        if (intersection.t != std::numeric_limits<double>::max()) {
+        if (intersection.t < std::numeric_limits<double>::max()) {
             y = ray.o + d * intersection.t;
             result += 1 / area_ * get_p_factor(x, y, intersection.normal);
         }

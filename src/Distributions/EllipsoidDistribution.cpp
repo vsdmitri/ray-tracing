@@ -1,6 +1,6 @@
 #include "EllipsoidDistribution.h"
 
-glm::dvec3 EllipsoidDistribution::sample(const glm::dvec3 &x, const glm::dvec3 &, RandomGenerator &r) const {
+glm::dvec3 EllipsoidDistribution::sample(const glm::dvec3 &x, const glm::dvec3 &, RandomGenerator &r, bool) const {
     auto global = ellipsoid_->rs * r.get_random_sphere_vec();
     fast_rotate(ellipsoid_->rotation, global);
     return glm::normalize(global + ellipsoid_->position - x);
