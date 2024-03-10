@@ -87,7 +87,7 @@ Color Scene::process_diffuse(const SceneIntersection &scene_intersection, const 
     glm::dvec3 w;
     double pdf = 0;
 
-    while (pdf < 1e-3) {
+    while (pdf == 0) {
         w = sampler->sample(point, normal, rnd);
         pdf = sampler->pdf(point, normal, w);
     }

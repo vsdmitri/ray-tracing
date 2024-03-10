@@ -21,8 +21,9 @@ double EllipsoidDistribution::pdf(const glm::dvec3 &x, const glm::dvec3 &, const
         nn2 *= nn2;
 
         result += get_p_factor(x, y, intersection.normal) * 0.25 * M_1_PI / sqrt(glm::dot(nn2, rr2));
-        intersection = ellipsoid_->intersect(ray);
         ray.o += d * intersection.t - SHIFT * intersection.normal;
+
+        intersection = ellipsoid_->intersect(ray);
         if (intersection.t != std::numeric_limits<double>::max()) {
             y = ray.o + d * intersection.t;
             point_on_sphere = y - ellipsoid_->position;
