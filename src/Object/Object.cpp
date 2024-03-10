@@ -10,5 +10,5 @@ ObjectIntersection Object::get_intersection_info(const Ray &ray, glm::vec3 &norm
     bool is_inside = glm::dot(normal, ray.dir) > 0;
     if (is_inside) normal *= -1;
     fast_rotate(rotation, normal);
-    return {t, normal, is_inside};
+    return {t, glm::normalize(normal), is_inside};
 }
