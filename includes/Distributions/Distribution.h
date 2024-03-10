@@ -11,7 +11,7 @@ struct Distribution {
 
     [[nodiscard]] virtual double pdf(const glm::dvec3 &x, const glm::dvec3 &n, const glm::dvec3 &d) const = 0;
 
-    double get_p_factor(const glm::dvec3 &d, const ObjectIntersection& intersection) const;
+    double get_p_factor(const glm::dvec3& x, const glm::dvec3& y, const glm::dvec3& n) const;
 
     virtual ~Distribution() = default;
 };

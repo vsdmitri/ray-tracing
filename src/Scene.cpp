@@ -83,15 +83,14 @@ Color Scene::process_diffuse(const SceneIntersection &scene_intersection, const 
                              RandomGenerator &rnd) const {
     const auto &object = objects[scene_intersection.object_id];
     const auto &normal = scene_intersection.object_intersection.normal;
-    auto point = shift_point(ray, scene_intersection.object_intersection, 0);
+    auto point = shift_point(ray, scene_intersection.object_intersection, SHIFT);
     glm::dvec3 w;
     double pdf = 0;
-    while (pdf == 0) {
+
+    while (pdf < 1e-3) {
         w = sampler->sample(point, normal, rnd);
         pdf = sampler->pdf(point, normal, w);
     }
-
-    point = shift_point(ray, scene_intersection.object_intersection, SHIFT);
 
     Ray new_ray = {point, w};
     auto dot = glm::dot(w, normal);
