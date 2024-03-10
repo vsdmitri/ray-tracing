@@ -1,21 +1,25 @@
 #include "RandomGenerator.h"
 
-float RandomGenerator::get_random_float() {
-    return rnd() / 2147483647.0f;
+double RandomGenerator::get_random_float(double from, double to) {
+    return (to - from) * rnd() / 2147483647.0 + from;
 }
 
-glm::vec3 RandomGenerator::get_random_sphere_vec() {
+uint32_t RandomGenerator::get_random_uint(uint32_t to) {
+    return rnd() % to;
+}
+
+glm::dvec3 RandomGenerator::get_random_sphere_vec() {
     for (;;) {
-        glm::vec3 v = {get_random_float() * 2 - 1, get_random_float() * 2 - 1, get_random_float() * 2 - 1};
-        float norm2 = v.x * v.x + v.y * v.y + v.z * v.z;
+        glm::dvec3 v = {get_random_float(-1, 1), get_random_float(-1, 1), get_random_float(-1, 1)};
+        double norm2 = v.x * v.x + v.y * v.y + v.z * v.z;
         if (norm2 <= 1) {
-            return v / static_cast<float>(sqrt(norm2));
+            return v / static_cast<double>(sqrt(norm2));
         }
     }
 }
 
-glm::vec3 RandomGenerator::get_random_semi_sphere_vec(const glm::vec3 &normal) {
+glm::dvec3 RandomGenerator::get_random_semi_sphere_vec(const glm::dvec3 &normal) {
     auto v = get_random_sphere_vec();
-    return v * static_cast<float>(-2 * (glm::dot(normal, v) < 0) + 1);
+    return v * static_cast<double>(-2 * (glm::dot(normal, v) < 0) + 1);
 }
 

@@ -2,24 +2,31 @@
 
 ObjectIntersection Ellipsoid::intersect(Ray ray) const {
     prepare_ray(ray);
-    float c = glm::dot(ray.o / rs, ray.o / rs) - 1;
-    float b = 2 * glm::dot(ray.o / rs, ray.dir / rs);
-    float a = glm::dot(ray.dir / rs, ray.dir / rs);
-    float D = b * b - 4 * a * c;
+    double c = glm::dot(ray.o / rs, ray.o / rs) - 1;
+    double b = 2 * glm::dot(ray.o / rs, ray.dir / rs);
+    double a = glm::dot(ray.dir / rs, ray.dir / rs);
+    double D = b * b - 4 * a * c;
     if (D < 0) return {};
     D = sqrt(D);
 
-    float t1 = (-b - D) / (2 * a);
-    float t2 = (-b + D) / (2 * a);
+    double t1 = (-b - D) / (2 * a);
+    double t2 = (-b + D) / (2 * a);
 
     if (t2 < t1) std::swap(t1, t2);
-    float target_t;
-    if (t1 >= 0) target_t = t1;
-    else if (t2 >= 0) target_t = t2;
-    else return {};
+    ObjectIntersection result;
 
-    glm::vec3 P = ray.o + ray.dir * target_t;
-    glm::vec3 current_normal = P / rs / rs;
+    if (t1 >= 0) {
+        result.t = t1;
+    } else if (t2 >= 0) {
+        result.t = t2;
+    } else return {};
 
-    return {get_intersection_info(ray, current_normal, target_t)};
+    glm::dvec3 P = ray.o + ray.dir * result.t;
+    result.normal = P / rs / rs;
+    prepare_intersection_info(result, ray);
+    return result;
+}
+
+ObjectTag Ellipsoid::getTag() const {
+    return ObjectTag::Ellipsoid;
 }

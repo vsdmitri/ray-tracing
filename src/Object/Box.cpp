@@ -2,27 +2,37 @@
 
 ObjectIntersection Box::intersect(Ray ray) const {
     prepare_ray(ray);
-    glm::vec3 ts1 = (-s - ray.o) / ray.dir;
-    glm::vec3 ts2 = (+s - ray.o) / ray.dir;
+    glm::dvec3 ts1 = (-s - ray.o) / ray.dir;
+    glm::dvec3 ts2 = (+s - ray.o) / ray.dir;
     for (std::size_t i = 0; i < 3; i++)
         if (ts1[i] > ts2[i]) std::swap(ts1[i], ts2[i]);
-    float t1 = max3(ts1);
-    float t2 = min3(ts2);
+    double t1 = max3(ts1);
+    double t2 = min3(ts2);
 
     if (t2 < t1) return {};
 
-    float target_t;
-    if (t1 >= 0) target_t = t1;
-    else if (t2 >= 0) target_t = t2;
-    else return {};
+    ObjectIntersection result;
 
-    glm::vec3 P = ray.o + ray.dir * target_t;
-    glm::vec3 current_normal = P / s;
+    if (t1 >= 0) {
+        result.t = t1;
+    } else if (t2 >= 0) {
+        result.t = t2;
+    } else return {};
+
+    glm::dvec3 P = ray.o + ray.dir * result.t;
+    result.normal = P / s;
     for (std::size_t i = 0; i < 3; i++) {
-        if (std::abs(std::abs(current_normal[i]) - 1) < EPS) current_normal[i] = current_normal[i] > 0 ? 1 : -1;
-        else current_normal[i] = 0;
+        if (std::abs(std::abs(result.normal[i]) - 1) < EPS) result.normal[i] = result.normal[i] > 0 ? 1 : -1;
+        else result.normal[i] = 0;
     }
 
-    return {get_intersection_info(ray, current_normal, target_t)};
+    prepare_intersection_info(result, ray);
+
+    return result;
 }
+
+[[nodiscard]] ObjectTag Box::getTag() const {
+    return ObjectTag::Box;
+}
+
 

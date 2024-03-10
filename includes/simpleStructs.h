@@ -3,15 +3,15 @@
 
 #include "vec3.hpp"
 
-typedef glm::vec3 Color;
+typedef glm::dvec3 Color;
 
 struct Ray {
-    glm::vec3 o, dir;
+    glm::dvec3 o, dir;
 };
 
 struct ObjectIntersection {
-    float t = std::numeric_limits<float>::max();
-    glm::vec3 normal;
+    double t = std::numeric_limits<double>::max();
+    glm::dvec3 normal;
     bool is_inside;
 };
 

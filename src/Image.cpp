@@ -1,24 +1,24 @@
 #include "Image.h"
 
-glm::vec3 saturate(const glm::vec3 &color) {
-    return glm::clamp(color, glm::vec3(0.0), glm::vec3(1.0));
+glm::dvec3 saturate(const glm::dvec3 &color) {
+    return glm::clamp(color, glm::dvec3(0.0), glm::dvec3(1.0));
 }
 
-glm::vec3 aces_tonemap(const glm::vec3 &x) {
-    const float a = 2.51f;
-    const float b = 0.03f;
-    const float c = 2.43f;
-    const float d = 0.59f;
-    const float e = 0.14f;
+glm::dvec3 aces_tonemap(const glm::dvec3 &x) {
+    const double a = 2.51f;
+    const double b = 0.03f;
+    const double c = 2.43f;
+    const double d = 0.59f;
+    const double e = 0.14f;
     return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
 }
 
-uint8_t float_to_uint(float d) {
+uint8_t float_to_uint(double d) {
     return round(255 * d);
 }
 
 Image::Pixel prepare_color(Color color) {
-    static const float GAMMA = 2.2f, INVERSE_GAMMA = 1 / GAMMA;
+    static const double GAMMA = 2.2f, INVERSE_GAMMA = 1 / GAMMA;
     color = aces_tonemap(color);
     for (std::size_t i = 0; i < 3; i++) {
         color[i] = std::pow(color[i], INVERSE_GAMMA);

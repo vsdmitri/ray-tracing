@@ -9,6 +9,8 @@
 #include "Plane.h"
 #include "Ellipsoid.h"
 #include "Box.h"
+#include "BoxUniform.h"
+#include "EllipsoidDistribution.h"
 
 Scene parse(const std::string &input_filename);
 

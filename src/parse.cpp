@@ -3,6 +3,9 @@
 Scene parse(const std::string &input_filename = "../in.txt") {
     std::ifstream in(input_filename);
     Scene scene;
+
+    std::vector<std::unique_ptr<Distribution>> light_distributions;
+
     for (std::string line; std::getline(in, line);) {
         std::stringstream s(line);
         std::string command_name;
@@ -39,7 +42,7 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "CAMERA_FOV_X") {
-            float fov_x;
+            double fov_x;
             s >> fov_x;
             scene.camera.fov_tg2_x = std::tan(fov_x / 2);
             continue;
@@ -51,23 +54,23 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "PLANE") {
-            glm::vec3 normal;
+            glm::dvec3 normal;
             s >> normal;
-            scene.objects.back() = std::make_unique<Plane>(normal);
+            scene.objects.back() = std::make_shared<Plane>(normal);
             continue;
         }
 
         if (command_name == "ELLIPSOID") {
-            glm::vec3 rs;
+            glm::dvec3 rs;
             s >> rs;
-            scene.objects.back() = std::make_unique<Ellipsoid>(rs);
+            scene.objects.back() = std::make_shared<Ellipsoid>(rs);
             continue;
         }
 
         if (command_name == "BOX") {
-            glm::vec3 ss;
+            glm::dvec3 ss;
             s >> ss;
-            scene.objects.back() = std::make_unique<Box>(ss);
+            scene.objects.back() = std::make_shared<Box>(ss);
             continue;
         }
 
@@ -101,6 +104,20 @@ Scene parse(const std::string &input_filename = "../in.txt") {
 
         if (command_name == "EMISSION") {
             s >> scene.objects.back()->emission;
+            switch (scene.objects.back()->getTag()) {
+                case ObjectTag::Box: {
+                    auto ptr = std::dynamic_pointer_cast<Box>(scene.objects.back());
+                    light_distributions.push_back(std::make_unique<BoxUniform>(ptr));
+                    break;
+                }
+                case ObjectTag::Ellipsoid: {
+                    auto ptr = std::dynamic_pointer_cast<Ellipsoid>(scene.objects.back());
+                    light_distributions.push_back(std::make_unique<EllipsoidDistribution>(ptr));
+                    break;
+                }
+                case ObjectTag::Plane:
+                    break;
+            }
             continue;
         }
 
@@ -124,6 +141,6 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         std::cerr << "Unexpected command: " << command_name << "\n";
     }
 
-    scene.init();
+    scene.init(std::move(light_distributions));
     return scene;
 }

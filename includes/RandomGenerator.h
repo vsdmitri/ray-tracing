@@ -7,11 +7,13 @@
 
 class RandomGenerator {
 public:
-    float get_random_float();
+    double get_random_float(double from = 0., double to = 1.);
 
-    glm::vec3 get_random_sphere_vec();
+    uint32_t get_random_uint(uint32_t to);
 
-    glm::vec3 get_random_semi_sphere_vec(const glm::vec3 &normal);
+    glm::dvec3 get_random_sphere_vec();
+
+    glm::dvec3 get_random_semi_sphere_vec(const glm::dvec3 &normal);
 
 private:
     std::minstd_rand rnd;
