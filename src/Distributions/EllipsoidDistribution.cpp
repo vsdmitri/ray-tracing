@@ -13,18 +13,18 @@ double EllipsoidDistribution::pdf(const glm::dvec3 &x, const glm::dvec3 &, const
 
     auto intersection = ellipsoid_->intersect(ray);
 
-    if (intersection.t != std::numeric_limits<double>::max()) {
-        auto y = x + d * intersection.t;
+    if (intersection.t < std::numeric_limits<double>::max()) {
+        auto y = x + d * (intersection.t + SHIFT);
         auto point_on_sphere = y - ellipsoid_->position;
         fast_rotate(ellipsoid_->inverse_rotation, point_on_sphere);
         glm::dvec3 nn2 = point_on_sphere / ellipsoid_->rs;
         nn2 *= nn2;
 
         result += get_p_factor(x, y, intersection.normal) * 0.25 * M_1_PI / sqrt(glm::dot(nn2, rr2));
-        ray.o += d * intersection.t - SHIFT * intersection.normal;
+        ray.o = y;
 
         intersection = ellipsoid_->intersect(ray);
-        if (intersection.t != std::numeric_limits<double>::max()) {
+        if (intersection.t < std::numeric_limits<double>::max()) {
             y = ray.o + d * intersection.t;
             point_on_sphere = y - ellipsoid_->position;
             fast_rotate(ellipsoid_->inverse_rotation, point_on_sphere);
