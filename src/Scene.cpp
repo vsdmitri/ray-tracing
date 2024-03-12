@@ -16,7 +16,7 @@ void Scene::init(std::vector<std::unique_ptr<Distribution>> &&light_distribution
     if (!light_distributions.empty()) {
         std::vector<std::unique_ptr<Distribution>> final_dists;
         final_dists.emplace_back(std::make_unique<Cosine>());
-
+        final_dists.emplace_back(std::make_unique<MixDistribution>(std::move(light_distributions)));
         sampler = std::make_unique<MixDistribution>(std::move(final_dists));
     } else {
         sampler = std::make_unique<Cosine>();
@@ -87,9 +87,8 @@ Color Scene::process_diffuse(const SceneIntersection &scene_intersection, const 
     glm::dvec3 w = sampler->sample(point, normal, rnd);
     double pdf = sampler->pdf(point, normal, w);
 
-    while (pdf == 0) {
-        w = sampler->sample(point, normal, rnd, true);
-        pdf = sampler->pdf(point, normal, w);
+    if (pdf == 0) {
+        return object->emission;
     }
 
     Ray new_ray = {point, w};
