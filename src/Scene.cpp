@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "algebraUtils.h"
 
 void Scene::Camera::init() {
     fov_tg2_y = fov_tg2_x * height / width;
@@ -87,8 +88,9 @@ Color Scene::process_diffuse(const SceneIntersection &scene_intersection, const 
     glm::dvec3 w = sampler->sample(point, normal, rnd);
     double pdf = sampler->pdf(point, normal, w);
 
-    if (pdf == 0) {
-        return object->emission;
+    while (pdf == 0) {
+        w = sampler->sample(point, normal, rnd, true);
+        pdf = sampler->pdf(point, normal, w);
     }
 
     Ray new_ray = {point, w};
@@ -110,7 +112,7 @@ Color Scene::process_dielectric(const SceneIntersection &scene_intersection, con
                                 RandomGenerator &rnd) const {
     auto &object = objects[scene_intersection.object_id];
     double n1 = 1;
-    double n2 = object->index_of_reflection;
+    double n2 = object->index_of_refraction;
     if (scene_intersection.object_intersection.is_inside) std::swap(n1, n2);
     auto &normal = scene_intersection.object_intersection.normal;
 
@@ -125,10 +127,8 @@ Color Scene::process_dielectric(const SceneIntersection &scene_intersection, con
     double cos_theta2 = sqrt(1 - sin_theta2 * sin_theta2);
     glm::dvec3 refracted_direction = n1 / n2 * ray.dir + (n1 / n2 * cos_theta1 - cos_theta2) * normal;
 
-    double R0 = (n1 - n2) * (n1 - n2) / (n1 + n2) / (n1 + n2);
-    double reflection_factor = R0 +
-                               (1 - R0) * (1 - cos_theta1) * (1 - cos_theta1) * (1 - cos_theta1) * (1 - cos_theta1) *
-                               (1 - cos_theta1);
+    double R0 = sqr((n1 - n2) / (n1 + n2));
+    double reflection_factor = R0 + (1 - R0) * pow5(1 - cos_theta1);
     if (rnd.get_random_float() <= reflection_factor) {
         return get_reflected_color(shifted_back_point, normal, ray, depth, rnd);
     } else {

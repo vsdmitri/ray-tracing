@@ -132,7 +132,7 @@ Scene parse(const std::string &input_filename = "../in.txt") {
         }
 
         if (command_name == "IOR") {
-            s >> scene.objects.back()->index_of_reflection;
+            s >> scene.objects.back()->index_of_refraction;
             continue;
         }
 

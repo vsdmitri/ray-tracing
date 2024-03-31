@@ -18,7 +18,7 @@ struct Object {
     glm::dvec3 position = {0, 0, 0}, emission = {0, 0, 0};
     glm::dquat rotation = {1, 0, 0, 0}, inverse_rotation = {1, 0, 0, 0};
     Color color;
-    double index_of_reflection;
+    double index_of_refraction;
     Material material = Material::DIFFUSE;
 
     [[nodiscard]] virtual ObjectIntersection intersect(Ray) const = 0;

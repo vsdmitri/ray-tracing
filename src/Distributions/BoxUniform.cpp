@@ -5,13 +5,12 @@ glm::dvec3 BoxUniform::sample(const glm::dvec3 &x, const glm::dvec3 &, RandomGen
     double a = r.get_random_float(-1., 1.), b = r.get_random_float(-1., 1.);
     const auto &s = box_->s;
 
-    // TODO: rewrite more accurate
     glm::dvec3 result;
-    if (u < w_.x / 2) result = {s.x, s.y * a, s.z * b};
-    else if (u < w_.x) result = {-s.x, s.y * a, s.z * b};
-    else if (u < w_.x + w_.y / 2) result = {s.x * a, s.y, s.z * b};
-    else if (u < w_.x + w_.y) result = {s.x * a, -s.y, s.z * b};
-    else if (u < w_.x + w_.y + w_.z / 2) result = {s.x * a, s.y * b, s.z};
+    if (u < w_.x) result = {s.x, s.y * a, s.z * b};
+    else if (u < 2 * w_.x) result = {-s.x, s.y * a, s.z * b};
+    else if (u < 2 * w_.x + w_.y) result = {s.x * a, s.y, s.z * b};
+    else if (u < 2 * (w_.x + w_.y)) result = {s.x * a, -s.y, s.z * b};
+    else if (u < 2 * (w_.x + w_.y) + w_.z) result = {s.x * a, s.y * b, s.z};
     else result = {s.x * a, s.y * b, -s.z};
 
     fast_rotate(box_->rotation, result);
