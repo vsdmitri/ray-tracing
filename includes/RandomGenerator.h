@@ -16,7 +16,7 @@ public:
     glm::dvec3 get_random_semi_sphere_vec(const glm::dvec3 &normal);
 
 private:
-    std::minstd_rand rnd;
+    std::minstd_rand rnd_;
 };
 
 #endif //RAY_TRACING_RANDOMGENERATOR_H

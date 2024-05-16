@@ -10,14 +10,14 @@
 #include "simpleStructs.h"
 
 struct Image {
-    Image(uint32_t width, uint32_t height) : width(width), height(height), pixels(width * height) {}
+    Image(uint32_t width, uint32_t height) : width_(width), height_(height), pixels_(width * height) {}
 
     struct Pixel {
         uint8_t r, g, b;
     };
 
-    uint32_t width, height;
-    std::vector<Pixel> pixels;
+    uint32_t width_, height_;
+    std::vector<Pixel> pixels_;
 
     void set_color(uint32_t j, uint32_t i, const Color& color);
 

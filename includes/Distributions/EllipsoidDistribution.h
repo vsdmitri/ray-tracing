@@ -9,9 +9,9 @@
 
 struct EllipsoidDistribution : Distribution {
     EllipsoidDistribution(std::shared_ptr<Ellipsoid> &ellipsoid) : ellipsoid_(ellipsoid) {
-        rr2 = {ellipsoid_->rs.y * ellipsoid_->rs.z, ellipsoid_->rs.x * ellipsoid_->rs.z,
-               ellipsoid_->rs.x * ellipsoid_->rs.y,};
-        rr2 *= rr2;
+        rr2_ = {ellipsoid_->rs_.y * ellipsoid_->rs_.z, ellipsoid_->rs_.x * ellipsoid_->rs_.z,
+               ellipsoid_->rs_.x * ellipsoid_->rs_.y,};
+        rr2_ *= rr2_;
     };
 
     glm::dvec3 sample(const glm::dvec3 &x, const glm::dvec3 &n, RandomGenerator &r, bool regen = true) const override;
@@ -20,7 +20,7 @@ struct EllipsoidDistribution : Distribution {
 
     std::shared_ptr<Ellipsoid> ellipsoid_;
 
-    glm::dvec3 rr2;
+    glm::dvec3 rr2_;
 };
 
 

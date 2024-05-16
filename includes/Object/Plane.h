@@ -5,13 +5,13 @@
 
 
 struct Plane : Object {
-    Plane(glm::dvec3 n) : normal(n) {}
+    Plane(glm::dvec3 n) : normal_(n) {}
 
-    [[nodiscard]] ObjectIntersection intersect(Ray) const override;
+    [[nodiscard]] ObjectIntersection intersect(Ray) override;
 
     [[nodiscard]] ObjectTag getTag() const override;
 
-    glm::dvec3 normal;
+    glm::dvec3 normal_;
 };
 
 

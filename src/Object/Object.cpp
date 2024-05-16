@@ -13,3 +13,7 @@ void Object::prepare_intersection_info(ObjectIntersection &intersection, const R
     fast_rotate(rotation, normal);
     intersection.normal = glm::normalize(normal);
 }
+
+AABB Object::getAABB() const {
+    return {};
+}

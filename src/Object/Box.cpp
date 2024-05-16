@@ -1,9 +1,9 @@
 #include "Box.h"
 
-ObjectIntersection Box::intersect(Ray ray) const {
+ObjectIntersection Box::intersect(Ray ray) {
     prepare_ray(ray);
-    glm::dvec3 ts1 = (-s - ray.o) / ray.dir;
-    glm::dvec3 ts2 = (+s - ray.o) / ray.dir;
+    glm::dvec3 ts1 = (-s_ - ray.o) / ray.dir;
+    glm::dvec3 ts2 = (+s_ - ray.o) / ray.dir;
     for (std::size_t i = 0; i < 3; i++)
         if (ts1[i] > ts2[i]) std::swap(ts1[i], ts2[i]);
     double t1 = max3(ts1);
@@ -20,7 +20,7 @@ ObjectIntersection Box::intersect(Ray ray) const {
     } else return {};
 
     glm::dvec3 P = ray.o + ray.dir * result.t;
-    result.normal = P / s;
+    result.normal = P * s_inverse_;
     for (std::size_t i = 0; i < 3; i++) {
         if (std::abs(std::abs(result.normal[i]) - 1) < EPS) result.normal[i] = result.normal[i] > 0 ? 1 : -1;
         else result.normal[i] = 0;
@@ -33,6 +33,15 @@ ObjectIntersection Box::intersect(Ray ray) const {
 
 [[nodiscard]] ObjectTag Box::getTag() const {
     return ObjectTag::Box;
+}
+
+// TODO
+AABB Box::getAABB() const {
+    AABB aabb;
+//    aabb.extend(a);
+//    aabb.extend(b);
+//    aabb.extend(c);
+    return aabb;
 }
 
 

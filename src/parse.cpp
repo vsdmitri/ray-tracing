@@ -74,6 +74,13 @@ Scene parse(const std::string &input_filename = "../in.txt") {
             continue;
         }
 
+        if (command_name == "TRIANGLE") {
+            glm::dvec3 a, b, c;
+            s >> a >> b >> c;
+            scene.objects.back() = std::make_shared<Triangle>(a, b, c);
+            continue;
+        }
+
         if (command_name == "POSITION") {
             s >> scene.objects.back()->position;
             continue;
@@ -113,6 +120,11 @@ Scene parse(const std::string &input_filename = "../in.txt") {
                 case ObjectTag::Ellipsoid: {
                     auto ptr = std::dynamic_pointer_cast<Ellipsoid>(scene.objects.back());
                     light_distributions.push_back(std::make_unique<EllipsoidDistribution>(ptr));
+                    break;
+                }
+                case ObjectTag::Triangle: {
+                    auto ptr = std::dynamic_pointer_cast<Triangle>(scene.objects.back());
+                    light_distributions.push_back(std::make_unique<TriangleDistribution>(ptr));
                     break;
                 }
                 case ObjectTag::Plane:

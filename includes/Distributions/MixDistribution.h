@@ -7,7 +7,7 @@
 
 struct MixDistribution : Distribution {
     MixDistribution(std::vector<std::unique_ptr<Distribution>> &&dists) : dists_(std::move(dists)) {
-        assert(dists_.size() > 0);
+        assert(!dists_.empty());
     }
 
     glm::dvec3 sample(const glm::dvec3 &x, const glm::dvec3 &n, RandomGenerator &r, bool regen = true) const override;

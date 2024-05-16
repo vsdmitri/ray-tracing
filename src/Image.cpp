@@ -27,11 +27,11 @@ Image::Pixel prepare_color(Color color) {
 }
 
 void Image::set_color(uint32_t j, uint32_t i, const Color &color) {
-    pixels[j * width + i] = prepare_color(color);
+    pixels_[j * width_ + i] = prepare_color(color);
 }
 
 void Image::save(const std::string &output_filename) {
     std::ofstream out(output_filename, std::ios::binary);
-    out << "P6" << std::endl << width << " " << height << std::endl << "255" << std::endl;
-    out.write(reinterpret_cast<char *>(pixels.data()), width * height * 3);
+    out << "P6" << std::endl << width_ << " " << height_ << std::endl << "255" << std::endl;
+    out.write(reinterpret_cast<char *>(pixels_.data()), width_ * height_ * 3);
 }

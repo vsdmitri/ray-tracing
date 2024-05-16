@@ -1,11 +1,11 @@
 #include "RandomGenerator.h"
 
 double RandomGenerator::get_random_float(double from, double to) {
-    return (to - from) * rnd() / 2147483647.0 + from;
+    return (to - from) * rnd_() / 2147483647.0 + from;
 }
 
 uint32_t RandomGenerator::get_random_uint(uint32_t to) {
-    return rnd() % to;
+    return rnd_() % to;
 }
 
 glm::dvec3 RandomGenerator::get_random_sphere_vec() {

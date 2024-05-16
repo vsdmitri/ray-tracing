@@ -1,10 +1,10 @@
 #include "Ellipsoid.h"
 
-ObjectIntersection Ellipsoid::intersect(Ray ray) const {
+ObjectIntersection Ellipsoid::intersect(Ray ray) {
     prepare_ray(ray);
-    double c = glm::dot(ray.o / rs, ray.o / rs) - 1;
-    double b = 2 * glm::dot(ray.o / rs, ray.dir / rs);
-    double a = glm::dot(ray.dir / rs, ray.dir / rs);
+    double c = glm::dot(ray.o * rs_inverse_, ray.o * rs_inverse_) - 1;
+    double b = 2 * glm::dot(ray.o * rs_inverse_, ray.dir * rs_inverse_);
+    double a = glm::dot(ray.dir * rs_inverse_, ray.dir * rs_inverse_);
     double D = b * b - 4 * a * c;
     if (D < 0) return {};
     D = sqrt(D);
@@ -22,11 +22,20 @@ ObjectIntersection Ellipsoid::intersect(Ray ray) const {
     } else return {};
 
     glm::dvec3 P = ray.o + ray.dir * result.t;
-    result.normal = P / rs / rs;
+    result.normal = P * rs_inverse_ * rs_inverse_;
     prepare_intersection_info(result, ray);
     return result;
 }
 
 ObjectTag Ellipsoid::getTag() const {
     return ObjectTag::Ellipsoid;
+}
+
+// TODO
+AABB Ellipsoid::getAABB() const {
+    AABB aabb;
+//    aabb.extend(a);
+//    aabb.extend(b);
+//    aabb.extend(c);
+    return aabb;
 }

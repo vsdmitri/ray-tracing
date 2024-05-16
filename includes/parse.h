@@ -11,6 +11,7 @@
 #include "Box.h"
 #include "BoxUniform.h"
 #include "EllipsoidDistribution.h"
+#include "TriangleDistribution.h"
 
 Scene parse(const std::string &input_filename);
 

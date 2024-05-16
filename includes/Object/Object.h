@@ -7,11 +7,13 @@
 
 #include "simpleStructs.h"
 #include "geometryUtils.hpp"
+#include "AABB.h"
 
 enum class ObjectTag {
     Box,
     Ellipsoid,
     Plane,
+    Triangle,
 };
 
 struct Object {
@@ -21,9 +23,11 @@ struct Object {
     double index_of_refraction;
     Material material = Material::DIFFUSE;
 
-    [[nodiscard]] virtual ObjectIntersection intersect(Ray) const = 0;
+    [[nodiscard]] virtual ObjectIntersection intersect(Ray) = 0;
 
-   virtual ObjectTag getTag() const = 0;
+    virtual ObjectTag getTag() const = 0;
+
+    virtual AABB getAABB() const;
 
     void prepare_ray(Ray &ray) const;
 

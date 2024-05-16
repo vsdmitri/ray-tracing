@@ -1,7 +1,7 @@
 #include "EllipsoidDistribution.h"
 
 glm::dvec3 EllipsoidDistribution::sample(const glm::dvec3 &x, const glm::dvec3 &, RandomGenerator &r, bool) const {
-    auto global = ellipsoid_->rs * r.get_random_sphere_vec();
+    auto global = ellipsoid_->rs_ * r.get_random_sphere_vec();
     fast_rotate(ellipsoid_->rotation, global);
     return glm::normalize(global + ellipsoid_->position - x);
 }
@@ -17,10 +17,10 @@ double EllipsoidDistribution::pdf(const glm::dvec3 &x, const glm::dvec3 &, const
         auto y = x + d * (intersection.t + SHIFT);
         auto point_on_sphere = y - ellipsoid_->position;
         fast_rotate(ellipsoid_->inverse_rotation, point_on_sphere);
-        glm::dvec3 nn2 = point_on_sphere / ellipsoid_->rs;
+        glm::dvec3 nn2 = point_on_sphere * ellipsoid_->rs_inverse_;
         nn2 *= nn2;
 
-        result += get_p_factor(x, y, intersection.normal) * 0.25 * M_1_PI / sqrt(glm::dot(nn2, rr2));
+        result += get_p_factor(x, y, intersection.normal) * 0.25 * M_1_PI / sqrt(glm::dot(nn2, rr2_));
         ray.o = y;
 
         intersection = ellipsoid_->intersect(ray);
@@ -28,9 +28,9 @@ double EllipsoidDistribution::pdf(const glm::dvec3 &x, const glm::dvec3 &, const
             y = ray.o + d * intersection.t;
             point_on_sphere = y - ellipsoid_->position;
             fast_rotate(ellipsoid_->inverse_rotation, point_on_sphere);
-            nn2 = point_on_sphere / ellipsoid_->rs;
+            nn2 = point_on_sphere * ellipsoid_->rs_inverse_;
             nn2 *= nn2;
-            result += get_p_factor(x, y, intersection.normal) * 0.25 * M_1_PI / sqrt(glm::dot(nn2, rr2));
+            result += get_p_factor(x, y, intersection.normal) * 0.25 * M_1_PI / sqrt(glm::dot(nn2, rr2_));
         }
     }
 
