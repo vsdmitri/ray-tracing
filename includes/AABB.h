@@ -3,15 +3,19 @@
 
 #include <glm.hpp>
 
-struct AABB {
-    glm::dvec3 min = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
-                      std::numeric_limits<double>::max()};
-    glm::dvec3 max = {std::numeric_limits<double>::min(), std::numeric_limits<double>::min(),
-                      std::numeric_limits<double>::min()};
+#include "simpleStructs.h"
 
+struct AABB {
     void extend(const glm::dvec3 &p);
 
     void extend(const AABB &aabb);
+
+    [[nodiscard]] bool intersect(const Ray &r) const;
+
+
+    glm::dvec3 min_ = {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
+                       std::numeric_limits<double>::max()};
+    glm::dvec3 max_ = -min_;
 };
 
 

@@ -1,6 +1,8 @@
 #include "Scene.h"
 #include "algebraUtils.h"
 
+#include <iostream>
+
 void Scene::Camera::init() {
     fov_tg2_y = fov_tg2_x * height / width;
 }
@@ -12,8 +14,24 @@ Ray Scene::Camera::get_ray(double pixel_x, double pixel_y) const {
 
 }
 
-void Scene::init(std::vector<std::unique_ptr<Distribution>> &&light_distributions) {
+void Scene::init(std::vector<std::unique_ptr<Distribution>> &&light_distributions,
+                 std::vector<std::shared_ptr<Object>> &&objects) {
     camera.init();
+
+    std::vector<std::shared_ptr<Object>> primitives;
+
+    for (auto &&object: objects) {
+        if (object->getTag() == ObjectTag::Plane) {
+            planes_.push_back(std::move(object));
+        } else {
+            primitives.push_back(std::move(object));
+        }
+    }
+
+    objects.clear();
+
+    objects_bvh_.build(std::move(primitives));
+
     if (!light_distributions.empty()) {
         std::vector<std::unique_ptr<Distribution>> final_dists;
         final_dists.emplace_back(std::make_unique<Cosine>());
@@ -42,8 +60,8 @@ Color Scene::get_color(const Ray &ray, RandomGenerator &rnd, uint8_t depth) cons
     if (depth == ray_depth) return {0, 0, 0};
     auto intersection_result = intersect_ray(ray);
     if (intersection_result.object_id == SceneIntersection::NO_OBJECT_ID) return bg_color;
-
-    const auto &object = objects[intersection_result.object_id];
+    const auto id = intersection_result.object_id;
+    const auto &object = id >= 0 ? objects_bvh_.primitives_[id] : planes_[-id - 1];
 
     switch (object->material) {
         case Material::DIFFUSE:
@@ -58,19 +76,19 @@ Color Scene::get_color(const Ray &ray, RandomGenerator &rnd, uint8_t depth) cons
 }
 
 SceneIntersection Scene::intersect_ray(const Ray &ray) const {
-    SceneIntersection scene_intersection;
-    scene_intersection.object_id = SceneIntersection::NO_OBJECT_ID;
-
-    for (std::size_t i = 0; i < objects.size(); i++) {
-        const auto &object = objects[i];
-        auto result = object->intersect(ray);
-        if (result.t < scene_intersection.object_intersection.t) {
-            scene_intersection.object_intersection = result;
-            scene_intersection.object_id = i;
+    SceneIntersection planes_intersection;
+    planes_intersection.object_id = SceneIntersection::NO_OBJECT_ID;
+    for (std::size_t i = 0; i < planes_.size(); i++) {
+        auto &plane = planes_[i];
+        auto result = plane->intersect(ray);
+        if (result.t < planes_intersection.object_intersection.t) {
+            planes_intersection.object_intersection = result;
+            planes_intersection.object_id = -i - 1;
         }
     }
 
-    return scene_intersection;
+    objects_bvh_.intersect(ray, objects_bvh_.root, planes_intersection);
+    return planes_intersection;
 }
 
 Color Scene::get_reflected_color(const glm::dvec3 &point, const glm::dvec3 &normal, const Ray &ray,
@@ -82,7 +100,8 @@ Color Scene::get_reflected_color(const glm::dvec3 &point, const glm::dvec3 &norm
 
 Color Scene::process_diffuse(const SceneIntersection &scene_intersection, const Ray &ray, uint8_t depth,
                              RandomGenerator &rnd) const {
-    const auto &object = objects[scene_intersection.object_id];
+    const auto id = scene_intersection.object_id;
+    const auto &object = id >= 0 ? objects_bvh_.primitives_[id] : planes_[-id - 1];
     const auto &normal = scene_intersection.object_intersection.normal;
     auto point = shift_point(ray, scene_intersection.object_intersection, SHIFT);
     glm::dvec3 w = sampler->sample(point, normal, rnd);
@@ -103,14 +122,16 @@ Color Scene::process_diffuse(const SceneIntersection &scene_intersection, const 
 
 Color Scene::process_metalic(const SceneIntersection &scene_intersection, const Ray &ray,
                              uint8_t depth, RandomGenerator &rnd) const {
-    auto &object = objects[scene_intersection.object_id];
+    const auto id = scene_intersection.object_id;
+    const auto &object = id >= 0 ? objects_bvh_.primitives_[id] : planes_[-id - 1];
     auto point = shift_point(ray, scene_intersection.object_intersection, SHIFT);
     return object->color * get_reflected_color(point, scene_intersection.object_intersection.normal, ray, depth, rnd);
 }
 
 Color Scene::process_dielectric(const SceneIntersection &scene_intersection, const Ray &ray, uint8_t depth,
                                 RandomGenerator &rnd) const {
-    auto &object = objects[scene_intersection.object_id];
+    const auto id = scene_intersection.object_id;
+    const auto &object = id >= 0 ? objects_bvh_.primitives_[id] : planes_[-id - 1];
     double n1 = 1;
     double n2 = object->index_of_refraction;
     if (scene_intersection.object_intersection.is_inside) std::swap(n1, n2);

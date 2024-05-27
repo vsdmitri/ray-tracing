@@ -31,11 +31,14 @@ ObjectTag Ellipsoid::getTag() const {
     return ObjectTag::Ellipsoid;
 }
 
-// TODO
 AABB Ellipsoid::getAABB() const {
     AABB aabb;
-//    aabb.extend(a);
-//    aabb.extend(b);
-//    aabb.extend(c);
+    for (int x: {-1, 1}) {
+        for (int y: {-1, 1}) {
+            for (int z: {-1, 1}) {
+                aabb.extend(move_point(rotation, position, rs_ * glm::dvec3{x, y, z}));
+            }
+        }
+    }
     return aabb;
 }

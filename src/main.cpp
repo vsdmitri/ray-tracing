@@ -1,5 +1,7 @@
 #include <chrono>
 
+#include <omp.h>
+
 #include "Scene.h"
 #include "parse.h"
 #include "Image.h"
@@ -15,8 +17,9 @@ int main(int argc, char **argv) {
     Scene scene = parse(argv[1]);
     Image img(scene.camera.width, scene.camera.height);
 
-    RandomGenerator r;
+#pragma omp parallel for
     for (std::size_t i = 0; i < scene.camera.width; i++) {
+        RandomGenerator r;
         for (std::size_t j = 0; j < scene.camera.height; j++) {
             img.set_color(j, i, scene.get_pixel_color(i, j, r));
         }

@@ -7,6 +7,8 @@
 
 class RandomGenerator {
 public:
+    RandomGenerator();
+
     double get_random_float(double from = 0., double to = 1.);
 
     uint32_t get_random_uint(uint32_t to);

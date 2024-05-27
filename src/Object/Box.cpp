@@ -2,8 +2,9 @@
 
 ObjectIntersection Box::intersect(Ray ray) {
     prepare_ray(ray);
-    glm::dvec3 ts1 = (-s_ - ray.o) / ray.dir;
-    glm::dvec3 ts2 = (+s_ - ray.o) / ray.dir;
+    auto inverse_dir = 1. / ray.dir;
+    glm::dvec3 ts1 = (-s_ - ray.o) * inverse_dir;
+    glm::dvec3 ts2 = (+s_ - ray.o) * inverse_dir;
     for (std::size_t i = 0; i < 3; i++)
         if (ts1[i] > ts2[i]) std::swap(ts1[i], ts2[i]);
     double t1 = max3(ts1);
@@ -35,12 +36,15 @@ ObjectIntersection Box::intersect(Ray ray) {
     return ObjectTag::Box;
 }
 
-// TODO
 AABB Box::getAABB() const {
     AABB aabb;
-//    aabb.extend(a);
-//    aabb.extend(b);
-//    aabb.extend(c);
+    for (int x: {-1, 1}) {
+        for (int y: {-1, 1}) {
+            for (int z: {-1, 1}) {
+                aabb.extend(move_point(rotation, position, s_ * glm::dvec3{x, y, z}));
+            }
+        }
+    }
     return aabb;
 }
 

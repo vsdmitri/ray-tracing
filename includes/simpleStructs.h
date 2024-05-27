@@ -16,8 +16,8 @@ struct ObjectIntersection {
 };
 
 struct SceneIntersection {
-    static const std::size_t NO_OBJECT_ID = -1;
-    std::size_t object_id = NO_OBJECT_ID;
+    static const int NO_OBJECT_ID = std::numeric_limits<int>::max();
+    int object_id = NO_OBJECT_ID;
     ObjectIntersection object_intersection;
 };
 

@@ -24,8 +24,9 @@ ObjectTag Triangle::getTag() const {
 
 AABB Triangle::getAABB() const {
     AABB aabb;
-    aabb.extend(a_);
-    aabb.extend(b_);
-    aabb.extend(c_);
+
+    aabb.extend(move_point(rotation, position, a_));
+    aabb.extend(move_point(rotation, position, b_));
+    aabb.extend(move_point(rotation, position, c_));
     return aabb;
 }

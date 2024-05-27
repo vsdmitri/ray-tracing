@@ -17,11 +17,18 @@ struct Node {
 
 struct BVH {
     std::vector<Node> nodes;
-    uint32_t root;
+    uint32_t root{0};
 
-    void build_node(std::vector<std::shared_ptr<Object>> &primitives, uint32_t first, uint32_t count);
+    void build(std::vector<std::shared_ptr<Object>> &&primitives);
 
-    constexpr static uint32_t kMinSize = 2;
+    uint32_t build_node(uint32_t first, uint32_t count);
+
+    void intersect(const Ray &ray, uint32_t vertex, SceneIntersection &scene_intersection) const;
+
+    constexpr static uint32_t kMaxNodeSize = 4;
+    constexpr static uint32_t kNoChild = -1;
+
+    std::vector<std::shared_ptr<Object>> primitives_;
 };
 
 

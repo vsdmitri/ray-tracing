@@ -24,6 +24,7 @@ struct Triangle : Object {
 
     glm::dvec3 a_, b_, c_, normal_;
     glm::dmat3x3 mat_;
+    AABB aabb_;
 };
 
 
